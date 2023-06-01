@@ -27,7 +27,7 @@ public class P0_UI_Main extends JFrame {
 
         JButton homeButton = createSidePanelButton("Home");
         JButton retailersButton = createSidePanelButton("Retailers");
-        JButton employeesButton = createSidePanelButton("Employees"); //TODO: add if statement
+        JButton employeesButton = createSidePanelButton("Employees");
         JButton productsButton = createSidePanelButton("Products");
         JButton logsButton = createSidePanelButton("Logs");
 

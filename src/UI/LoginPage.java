@@ -8,10 +8,12 @@ import java.awt.event.ActionListener;
 public class LoginPage extends JFrame {
     public String currentUser;
     JLabel label1;
+    JLabel label2;
+    JLabel label3;
     JList<String> list;
     JButton button1;
 
-    public LoginPage() {
+    public LoginPage() { //TODO: add username and password UI @kartik
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(600, 400)); // Increase the window size
@@ -27,6 +29,25 @@ public class LoginPage extends JFrame {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         panel.add(label1, gbc);
+
+        //username
+        label2 = new JLabel("Username:");
+        label2.setFont(new Font("Arial", Font.BOLD, 20));
+
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.gridwidth = 2;
+//        panel.add(label1, gbc);
+
+        //password
+        label3 = new JLabel("Password:");
+        label3.setFont(new Font("Arial", Font.BOLD, 20));
+
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.gridwidth = 2;
+//        panel.add(label1, gbc);
+
 
         String[] user = {"Administrator", "Employee"};
         list = new JList<>(user);
@@ -47,7 +68,7 @@ public class LoginPage extends JFrame {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                String userType = (String) list.getSelectedValue();
+                String userType = (String) list.getSelectedValue(); //TODO: check credentials of user and password @kartik
                 P0_UI_Main mainPage = new P0_UI_Main(userType);
                 mainPage.setVisible(true);
                 dispose(); // Close the login page
