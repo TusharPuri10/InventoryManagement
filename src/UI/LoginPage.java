@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class LoginPage extends JFrame {
     public String currentUser;
@@ -68,10 +69,18 @@ public class LoginPage extends JFrame {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                String userType = (String) list.getSelectedValue(); //TODO: check credentials of user and password @kartik
-                P0_UI_Main mainPage = new P0_UI_Main(userType);
-                mainPage.setVisible(true);
-                dispose(); // Close the login page
+                String userType = (String) list.getSelectedValue(); //TODO: create input box for username and password @tushar
+
+
+                if (checkLogin("kartik", "ringo", "employee")) {
+                    P0_UI_Main mainPage = new P0_UI_Main(userType);
+                    mainPage.setVisible(true);
+                    dispose(); // Close the login page
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Invalid username or password.");
+                }
             }
         });
 
@@ -81,6 +90,41 @@ public class LoginPage extends JFrame {
         pack();
         setLocationRelativeTo(null); // Center the frame on the screen
         setVisible(true);
+    }
+
+    //    this function will check weather the user exist in the users table or not
+    public boolean checkLogin(String username, String password, String userType) {
+        String query = "SELECT * FROM users WHERE username = ? AND password = ? AND usertype = ? LIMIT 1";
+
+        try (Connection connection = getConn();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, username);
+            statement.setString(2, password);
+            statement.setString(3, userType);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public Connection getConn() {
+        String url = "jdbc:mysql://localhost:3306/inventory";
+        Connection conn = null;
+
+        try {
+            conn = DriverManager.getConnection(url, "root", "kartik@123"); //TODO - dont store database user and password in plain text @kartik
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return conn;
     }
 
 }
