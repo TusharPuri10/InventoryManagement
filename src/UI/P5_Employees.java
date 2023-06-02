@@ -13,6 +13,9 @@ public class P5_Employees extends JPanel {
     private JButton clearButton;
     private JPanel searchPanel;
     private JPanel buttonPanel;
+    private JScrollPane scrollPane;
+    private JButton addButton;
+    private JPanel topPanel;
     public P5_Employees() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -176,7 +179,7 @@ public class P5_Employees extends JPanel {
         }
 //Scroll Panel
         // Create a scroll pane for the table
-        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove default border
         scrollPane.setPreferredSize(new Dimension(800, 300)); // Set preferred size
 
@@ -185,10 +188,10 @@ public class P5_Employees extends JPanel {
 
 //ADD BUTTON TODO: @Divynash2042 add functionality and UI component
         // Create the add button
-        JButton addButton = new JButton("Add");
+        addButton = new JButton("Add New");
         addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
         // Set the preferred size for the button
-        addButton.setPreferredSize(new Dimension(80, 40)); // Adjust the size as needed
+        addButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
         // Create a panel for the button and set its layout
         buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
@@ -216,7 +219,7 @@ public class P5_Employees extends JPanel {
         searchField.setFont(largerFont);
 
 // Create a container panel to hold both the button panel and search panel
-        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel = new JPanel(new BorderLayout());
         topPanel.add(buttonPanel, BorderLayout.EAST);
         topPanel.add(searchPanel, BorderLayout.WEST);
 
