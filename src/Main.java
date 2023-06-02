@@ -10,6 +10,5 @@ public class Main {
         //Puri@123
         //login page here
         LoginPage page1 = new LoginPage();
-        //divyansh is in testing branch
     }
 }
