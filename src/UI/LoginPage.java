@@ -1,5 +1,8 @@
 package UI;
 
+import database.D0_DatabaseConnection;
+import database.D1_RetrieveData;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +19,7 @@ public class LoginPage extends JFrame {
     private JButton button1;
     private JPanel panel;
 
-    public LoginPage() { //TODO: add username and password UI @kartik
+    public LoginPage() {
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(600, 400)); // Increase the window size
@@ -97,17 +100,7 @@ public class LoginPage extends JFrame {
                 String username = usernameTextField.getText();
                 String password = new String(passwordField.getPassword());
                 String userType = (String) list.getSelectedValue();
-
-
-                if (checkLogin(username, password, userType)) {
-                    P0_UI_Main mainPage = new P0_UI_Main(userType);
-                    mainPage.setVisible(true);
-                    dispose(); // Close the login page
-                } else {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Invalid username or password.");
-                }
+                checkLogin(username, password, userType);
             }
         });
 
@@ -120,10 +113,10 @@ public class LoginPage extends JFrame {
     }
 
     //    this function will check weather the user exist in the users table or not
-    public boolean checkLogin(String username, String password, String userType) {
+    public void checkLogin(String username, String password, String userType) {
         String query = "SELECT * FROM users WHERE username = ? AND password = ? AND usertype = ?";
 
-        try (Connection connection = getConn();
+        try (Connection connection = D0_DatabaseConnection.getConn();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, username);
@@ -132,26 +125,20 @@ public class LoginPage extends JFrame {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return true;
+                    P0_UI_Main mainPage = new P0_UI_Main(userType,connection);
+                    mainPage.setVisible(true);
+                    dispose(); // Close the login page
                 }
+                else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Invalid username or password.");
+                }
+
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        return false;
-    }
-
-    public Connection getConn() {
-        String url = "jdbc:sqlserver://teamlsqlserver.database.windows.net:1433;database=inventory;user=azureuser@teamlsqlserver;password={your_password_here};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
-        Connection conn = null;
-
-        try {
-            conn = DriverManager.getConnection(url, "azureuser", "graphicera@123"); //TODO - dont store database user and password in plain text @kartik
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return conn;
     }
 
 }

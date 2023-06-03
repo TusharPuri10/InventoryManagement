@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 
 public class P0_UI_Main extends JFrame {
     private JPanel sidePanel;
@@ -15,7 +16,7 @@ public class P0_UI_Main extends JFrame {
     private JPanel productsPanel;
     private JPanel logsPanel;
 
-    public P0_UI_Main(String userType) {
+    public P0_UI_Main(String userType,Connection connection) {
         setTitle(userType + " Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(800, 500));
@@ -64,9 +65,9 @@ public class P0_UI_Main extends JFrame {
         contentPanel.setBackground(Color.WHITE);
 
         homePanel = new P1_Home();
-        retailersPanel = new P2_Retailers();
-        employeesPanel = new P5_Employees();
-        productsPanel = new P3_Products();
+        retailersPanel = new P2_Retailers(userType,connection);
+        employeesPanel = new P5_Employees(connection);
+        productsPanel = new P3_Products(userType,connection);
         logsPanel = new P4_Logs();
 
         contentPanel.add(homePanel, "Home");

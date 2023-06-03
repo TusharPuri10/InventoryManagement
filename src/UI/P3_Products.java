@@ -1,5 +1,8 @@
 package UI;
 
+import database.employee;
+import database.product;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -7,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 
 public class P3_Products extends JPanel {
     private JTextField searchField;
@@ -17,73 +21,24 @@ public class P3_Products extends JPanel {
     private JScrollPane scrollPane;
     private JButton addButton;
     private JPanel topPanel;
+    private String[] headers;
+    private Object data[][];
+    private int[] columnWidths;
 
-    public P3_Products() {
+    public P3_Products(String userType, Connection connection) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
         // Table headers
-        String[] headers = {"Product ID", "Product Name:", "Category", "Cost Price", "Selling Price", "Quantity", "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Supplier", "Supplier Code","Lead Time"};
+        if(userType=="Administrator")
+            headers = new String[]{"Product ID", "Product Name:", "Category", "Cost Price", "Selling Price", "Quantity", "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Manufacturer", "Manufacturer Code", "Lead Time"};
+        else
+            headers = new String[]{"Product ID", "Product Name:", "Category", "Quantity", "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Lead Time"};
 
-        // Sample data for the table
-        Object[][] data = {
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"},
-                {"P001", "Sample Product","Electronics","$10.00", "$19.99",50,10,100,20,"ABC Suppliers","SUP001","7 days"}
-
-        // Add more rows as needed
-        };
+        // Retrieve data from MySQL database if not already retrieved
+        if (data == null) {
+            data = product.getAllproducts(userType, connection);
+        }
 
 
         // Create a table model with the data
@@ -97,7 +52,10 @@ public class P3_Products extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto resizing of columns
 
         // Adjust column widths
-        int[] columnWidths = {100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
+        if(userType=="Administrator")
+            columnWidths = new int[]{100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
+        else
+            columnWidths = new int[]{100, 150, 150, 180, 180, 120, 150, 120};
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }

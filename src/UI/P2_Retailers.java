@@ -1,5 +1,8 @@
 package UI;
 
+import database.product;
+import database.retailer;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -7,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 
 public class P2_Retailers extends JPanel {
     private JTextField searchField;
@@ -17,79 +21,23 @@ public class P2_Retailers extends JPanel {
     private JScrollPane scrollPane;
     private JButton addButton;
     private JPanel topPanel;
+    private String[] headers;
+    private Object data[][];
+    private int[] columnWidths;
 
-    public P2_Retailers() {
+    public P2_Retailers(String userType, Connection connection) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // Table headers
-        String[] headers = {"Retailer ID", "Retailer Name", "Contact Person", "Contact Email", "Contact Phone", "Contact Address", "Shipping Address", "Payment Terms", "Preferred Shipping Method", "Tax ID", "Current Balance"};
+        if(userType=="Administrator")
+            headers = new String[]{"Retailer ID", "Retailer Name", "Contact Person", "Contact Email", "Contact Phone", "Contact Address", "Shipping Address", "Payment Terms", "Preferred Shipping Method", "Tax ID", "Current Balance"};
+        else
+            headers = new String[]{"Retailer ID", "Retailer Name", "Contact Person", "Contact Email", "Contact Phone", "Contact Address", "Shipping Address","Preferred Shipping Method",};
 
-        // Sample data for the table
-        Object[][] data = {
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00}, {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-                {1, "Retailer 1", "John Doe", "john.doe@example.com", "123-456-7890", "Address 1", "Address 1", "Net 30", "Express", "12345678", 1000.00},
-                {2, "Retailer 2", "Jane Smith", "jane.smith@example.com", "987-654-3210", "Address 2", "Address 2", "Net 60", "Standard", "87654321", 2500.00},
-
-                // Add more rows as needed
-        };
+        // Retrieve data from MySQL database if not already retrieved
+        if (data == null) {
+            data = retailer.getAllretailers(userType, connection);
+        }
 
 
         // Create a table model with the data
@@ -102,8 +50,10 @@ public class P2_Retailers extends JPanel {
         table.setRowHeight(25); // Set row height
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto resizing of columns
 
-        // Adjust column widths
-        int[] columnWidths = {100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120};
+        if(userType=="Administrator")
+            columnWidths = new int[]{100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
+        else
+            columnWidths = new int[]{100, 150, 150, 180, 180, 120, 150, 120};
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }

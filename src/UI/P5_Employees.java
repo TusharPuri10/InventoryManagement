@@ -6,6 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.util.Arrays;
+import database.employee;
 
 public class P5_Employees extends JPanel {
     private JTextField searchField;
@@ -16,151 +19,22 @@ public class P5_Employees extends JPanel {
     private JScrollPane scrollPane;
     private JButton addButton;
     private JPanel topPanel;
-    public P5_Employees() {
+
+    private Object[][] data; // Stores the retrieved data
+
+    public P5_Employees(Connection connection) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
         // Table headers
-        String[] headers =  {"Employee ID", "First Name", "Last Name", "Position/Job Title", "Department",
+        String[] headers = {"Employee ID", "First Name", "Last Name",
                 "Contact Email", "Contact Phone", "Address", "Date of Birth", "Date of Joining",
-                "Employment Status", "Manager"};
-        // Sample data for the table
-        Object[][] data = {
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "Tushar", "Puri", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"},
-                {"E001", "John", "Doe", "Software Engineer", "Engineering", "john.doe@example.com",
-                        "123-456-7890", "123, Main Street", "1990-05-15", "2015-08-01",
-                        "Full-time", "Jane Manager"},
-                {"E002", "Jane", "Smith", "Sales Manager", "Sales", "jane.smith@example.com",
-                        "987-654-3210", "456, Elm Street", "1988-12-10", "2017-02-15",
-                        "Full-time", "John Manager"}
-                // Add more rows as needed
-        };
+                "Employment Status"};
 
+        // Retrieve data from MySQL database if not already retrieved
+        if (data == null) {
+            data = employee.getAllEmployees(connection);
+        }
 
         // Create a table model with the data
         DefaultTableModel model = new DefaultTableModel(data, headers);
@@ -173,7 +47,7 @@ public class P5_Employees extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto resizing of columns
 
         // Adjust column widths
-        int[] columnWidths = {100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120,120};
+        int[] columnWidths = {100, 150, 150, 180, 180, 120, 150, 120, 120};
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }
