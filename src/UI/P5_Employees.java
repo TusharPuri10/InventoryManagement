@@ -9,19 +9,20 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.util.Arrays;
 import database.employee;
+import javax.swing.text.MaskFormatter;
 
 public class P5_Employees extends JPanel {
     private JTextField searchField;
-    private JTable table;
+    public static JTable table;
     private JButton clearButton;
     private JPanel searchPanel;
     private JPanel buttonPanel;
     private JScrollPane scrollPane;
     private JButton addButton;
     private JPanel topPanel;
+    private JFormattedTextField dobField;
 
     private Object[][] data; // Stores the retrieved data
-
     public P5_Employees(Connection connection) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -112,6 +113,17 @@ public class P5_Employees extends JPanel {
             }
         });
 
+        // addButton action listener
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        showAddEmployeeDialog();
+                    }
+                });
+            }
+        });
         // Add a document listener to the search field for real-time searching
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -156,7 +168,150 @@ public class P5_Employees extends JPanel {
             }
         }
     }
+    private void showAddEmployeeDialog() {
+        JFrame frame = new JFrame("Add New Employee");
+        frame.setSize(400, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel generalInfoPanel = new JPanel(new GridLayout(9, 2, 10, 10));
+        generalInfoPanel.setBorder(BorderFactory.createTitledBorder("General Information"));
+
+        generalInfoPanel.add(new JLabel("Employee ID:"));
+        JTextField employeeIdField = new JTextField();
+        generalInfoPanel.add(employeeIdField);
+
+        generalInfoPanel.add(new JLabel("First Name:"));
+        JTextField firstNameField = new JTextField();
+        generalInfoPanel.add(firstNameField);
+
+        generalInfoPanel.add(new JLabel("Last Name:"));
+        JTextField lastNameField = new JTextField();
+        generalInfoPanel.add(lastNameField);
+
+        generalInfoPanel.add(new JLabel("Contact Email:"));
+        JTextField emailField = new JTextField();
+        generalInfoPanel.add(emailField);
+
+        generalInfoPanel.add(new JLabel("Contact Phone:"));
+        JTextField phoneField = new JTextField();
+        generalInfoPanel.add(phoneField);
+
+        generalInfoPanel.add(new JLabel("Address:"));
+        JTextField addressField = new JTextField();
+        generalInfoPanel.add(addressField);
+
+        MaskFormatter dobFormatter;
+        try {
+            dobFormatter = new MaskFormatter("####-##-##");
+            dobFormatter.setPlaceholderCharacter('_');
+            dobField = new JFormattedTextField(dobFormatter);
+            dobField.setFont(new Font("Arial", Font.PLAIN, 12));
+            dobField.setPreferredSize(new Dimension(150, 25));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        generalInfoPanel.add(new JLabel("Date of Birth:"));
+        generalInfoPanel.add(dobField);
+
+        generalInfoPanel.add(new JLabel("Employment Status:"));
+        JTextField employmentStatusField = new JTextField();
+        generalInfoPanel.add(employmentStatusField);
+
+        JPanel credentialsPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        credentialsPanel.setBorder(BorderFactory.createTitledBorder("Setting up credentials"));
+
+        credentialsPanel.add(new JLabel("Username:"));
+        JTextField usernameField = new JTextField();
+        Font usernameFont = usernameField.getFont().deriveFont(Font.PLAIN, 16); // Increase text size
+        usernameField.setFont(usernameFont);
+        Dimension usernameFieldSize = usernameField.getPreferredSize();
+        usernameFieldSize.height = 20; // Decrease text field height
+        usernameField.setPreferredSize(usernameFieldSize);
+        credentialsPanel.add(usernameField);
+
+        credentialsPanel.add(new JLabel("Password:"));
+        JPasswordField passwordField = new JPasswordField();
+        Font passwordFont = passwordField.getFont().deriveFont(Font.PLAIN, 16); // Increase text size
+        passwordField.setFont(passwordFont);
+        Dimension passwordFieldSize = passwordField.getPreferredSize();
+        passwordFieldSize.height = 20; // Decrease text field height
+        passwordField.setPreferredSize(passwordFieldSize);
+        credentialsPanel.add(passwordField);
+
+        JButton addButton = new JButton("Add Employee");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String employeeID = employeeIdField.getText();
+
+                if (employeeID.isEmpty()) {
+                    String errorMessage = "Please fill all the fields.";
+                    JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
+                    // Dispose the dialog window
+                    frame.dispose();
+                } else {
+                    try {
+                        int employeeId = Integer.parseInt(employeeID);
+                        System.out.println("Parsed Employee ID: " + employeeId); // Debug statement
+
+                        String firstName = firstNameField.getText();
+                        String lastName = lastNameField.getText();
+                        String email = emailField.getText();
+                        String phone = phoneField.getText();
+                        String address = addressField.getText();
+                        String dob = dobField.getText();
+                        String employmentStatus = employmentStatusField.getText();
+                        String username = usernameField.getText();
+                        String password = new String(passwordField.getPassword());
+
+                        if (isNullOrEmpty(firstName) || isNullOrEmpty(lastName) || isNullOrEmpty(email) || isNullOrEmpty(phone)
+                                || isNullOrEmpty(address) || isNullOrEmpty(dob) || isNullOrEmpty(employmentStatus)
+                                || isNullOrEmpty(username) || isNullOrEmpty(password)) {
+                            String errorMessage = "Please fill all the fields.";
+                            JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
+                            // Dispose the dialog window
+                            frame.dispose();
+                        }
+
+                        // Adding row in database
+                        employee.addEmployee(employeeId, firstName, lastName, email, phone, address, dob, employmentStatus,
+                                username, password);
+
+                        // adding row in UI table
+
+                        // Dispose the dialog window
+                        frame.dispose();
+                    } catch (NumberFormatException ex) {
+                        String errorMessage = "Invalid Employee ID format. Please enter a valid integer.";
+                        JOptionPane.showMessageDialog(null, errorMessage, "Invalid Employee ID", JOptionPane.ERROR_MESSAGE);
+                        // Dispose the dialog window
+                        frame.dispose();
+                    }
+                }
+            }
+        });
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(addButton);
+
+        panel.add(generalInfoPanel, BorderLayout.NORTH);
+        panel.add(credentialsPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
     private void clearHighlight() {
         table.clearSelection();
     }

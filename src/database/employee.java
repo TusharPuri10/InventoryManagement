@@ -3,7 +3,14 @@ package database;
 import UI.P0_UI_Main;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+
+import static UI.P5_Employees.table;
 
 public class employee {
     public static Object[][] getAllEmployees(Connection connection) {
@@ -42,5 +49,129 @@ public class employee {
         }
     }
 
+    public static void addEmployee(int employeeId, String firstName, String lastName, String email, String phone,
+                                   String address, String dob, String employmentStatus, String username, String password) {
+        // Create an SQL INSERT statement for the employees table
+        String insertEmployeeQuery = "INSERT INTO employees (employeeID, firstName, lastName, Email, Phone, Address, DateofBirth, DateofJoining, Status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        //is userid exists
+        if(isUserIdExists(employeeId)){
+            String errorMessage = "User ID already exists. Please choose a different User ID.";
+            JOptionPane.showMessageDialog(null, errorMessage, "Duplicate User ID", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //is username exists
+        if(isUsernameExists(username)){
+            String errorMessage = "User ID already exists. Please choose a different User ID.";
+            JOptionPane.showMessageDialog(null, errorMessage, "Duplicate User ID", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
+        // Create an SQL INSERT statement for the users table
+        String insertUserQuery = "INSERT INTO users (userid, username, password,usertype) " +
+                "VALUES (?, ?, ?,?)";
+        try (Connection connection = D0_DatabaseConnection.getConn()) {
+        // Prepare the INSERT statements
+        PreparedStatement insertUserStatement = connection.prepareStatement(insertUserQuery);
+
+            // Add values to the INSERT statement for users
+
+            insertUserStatement.setInt(1, employeeId);
+            insertUserStatement.setString(2, username);
+            insertUserStatement.setString(3, password);
+            insertUserStatement.setString(4, "employee");
+
+            // Execute the INSERT statement for users
+
+            // Execute the INSERT statement for users
+            int rowsAffectedUser = insertUserStatement.executeUpdate();
+
+            // Close the insert statement for users
+            insertUserStatement.close();
+
+            PreparedStatement insertEmployeeStatement = connection.prepareStatement(insertEmployeeQuery);
+
+            // Add values to the INSERT statement for employees
+            insertEmployeeStatement.setInt(1, employeeId);
+            insertEmployeeStatement.setString(2, firstName);
+            insertEmployeeStatement.setString(3, lastName);
+            insertEmployeeStatement.setString(4, email);
+            insertEmployeeStatement.setString(5, phone);
+            insertEmployeeStatement.setString(6, address);
+
+            // Convert the date of birth string to a LocalDate object
+            LocalDate dobDate;
+            try {
+                dobDate = LocalDate.parse(dob);
+            } catch (DateTimeParseException e) {
+                String errorMessage = "Invalid date format for Date of Birth. Please use yyyy-MM-dd format.";
+                JOptionPane.showMessageDialog(null, errorMessage, "Invalid Date", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            insertEmployeeStatement.setDate(7, Date.valueOf(dobDate));
+
+            // Get the current date and time
+            LocalDate now = LocalDate.now();
+            insertEmployeeStatement.setDate(8, Date.valueOf(now));
+            insertEmployeeStatement.setString(9, employmentStatus);
+
+            // Execute the INSERT statement for employees
+            int rowsAffectedEmployee = insertEmployeeStatement.executeUpdate();
+
+            // Close the insert statements
+            insertEmployeeStatement.close();
+            insertUserStatement.close();
+
+            if (rowsAffectedEmployee > 0 && rowsAffectedUser > 0) {
+                // Retrieve the updated data from the database
+                Object[][] newData = getAllEmployees(connection);
+
+                // Update the table model with the new data
+                DefaultTableModel model = (DefaultTableModel) table.getModel();
+                model.setDataVector(newData, getTableHeaders());
+                model.fireTableDataChanged();
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static String[] getTableHeaders() {
+        return new String[]{"Employee ID", "First Name", "Last Name", "Contact Email", "Contact Phone", "Address",
+                "Date of Birth", "Date of Joining", "Employment Status"};
+    }
+
+    private static boolean isUserIdExists(int employeeId) {
+        String selectQuery = "SELECT COUNT(*) FROM users WHERE userid = ?";
+        try (Connection connection = D0_DatabaseConnection.getConn();
+             PreparedStatement statement = connection.prepareStatement(selectQuery)) {
+            statement.setInt(1, employeeId);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            int count = resultSet.getInt(1);
+            return count > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isUsernameExists(String username) {
+        String selectQuery = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (Connection connection = D0_DatabaseConnection.getConn();
+             PreparedStatement statement = connection.prepareStatement(selectQuery)) {
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            int count = resultSet.getInt(1);
+            return count > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
