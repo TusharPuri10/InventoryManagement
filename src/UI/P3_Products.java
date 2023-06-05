@@ -30,7 +30,7 @@ public class P3_Products extends JPanel {
         setBackground(Color.WHITE);
 
         // Table headers
-        if(userType=="Administrator")
+        if(userType.equals("Administrator"))
             headers = new String[]{"Product ID", "Product Name:", "Category", "Cost Price", "Selling Price", "Quantity", "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Manufacturer", "Manufacturer Code", "Lead Time"};
         else
             headers = new String[]{"Product ID", "Product Name:", "Category", "Quantity", "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Lead Time"};
@@ -52,7 +52,7 @@ public class P3_Products extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto resizing of columns
 
         // Adjust column widths
-        if(userType=="Administrator")
+        if(userType.equals("Administrator"))
             columnWidths = new int[]{100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
         else
             columnWidths = new int[]{100, 150, 150, 180, 180, 120, 150, 120};

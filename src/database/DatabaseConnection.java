@@ -3,7 +3,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class D0_DatabaseConnection {
+public class DatabaseConnection {
     public static Connection getConn() {
         String url = "jdbc:sqlserver://teamlsqlserver.database.windows.net:1433;database=inventory;user=azureuser@teamlsqlserver;password={your_password_here};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
         Connection conn = null;

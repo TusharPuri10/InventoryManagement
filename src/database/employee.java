@@ -1,13 +1,9 @@
 package database;
 
-import UI.P0_UI_Main;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
 import static UI.P5_Employees.table;
@@ -73,7 +69,7 @@ public class employee {
         // Create an SQL INSERT statement for the users table
         String insertUserQuery = "INSERT INTO users (userid, username, password,usertype) " +
                 "VALUES (?, ?, ?,?)";
-        try (Connection connection = D0_DatabaseConnection.getConn()) {
+        try (Connection connection = DatabaseConnection.getConn()) {
         // Prepare the INSERT statements
         PreparedStatement insertUserStatement = connection.prepareStatement(insertUserQuery);
 
@@ -148,7 +144,7 @@ public class employee {
 
     private static boolean isUserIdExists(int employeeId) {
         String selectQuery = "SELECT COUNT(*) FROM users WHERE userid = ?";
-        try (Connection connection = D0_DatabaseConnection.getConn();
+        try (Connection connection = DatabaseConnection.getConn();
              PreparedStatement statement = connection.prepareStatement(selectQuery)) {
             statement.setInt(1, employeeId);
             ResultSet resultSet = statement.executeQuery();
@@ -162,7 +158,7 @@ public class employee {
 
     private static boolean isUsernameExists(String username) {
         String selectQuery = "SELECT COUNT(*) FROM users WHERE username = ?";
-        try (Connection connection = D0_DatabaseConnection.getConn();
+        try (Connection connection = DatabaseConnection.getConn();
              PreparedStatement statement = connection.prepareStatement(selectQuery)) {
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();

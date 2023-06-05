@@ -1,7 +1,6 @@
 package UI;
 
-import database.D0_DatabaseConnection;
-import database.D1_RetrieveData;
+import database.DatabaseConnection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -116,7 +115,7 @@ public class LoginPage extends JFrame {
     public void checkLogin(String username, String password, String userType) {
         String query = "SELECT * FROM users WHERE username = ? AND password = ? AND usertype = ?";
 
-        try (Connection connection = D0_DatabaseConnection.getConn();
+        try (Connection connection = DatabaseConnection.getConn();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, username);

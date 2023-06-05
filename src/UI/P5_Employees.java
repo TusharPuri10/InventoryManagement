@@ -61,7 +61,7 @@ public class P5_Employees extends JPanel {
         // Add the scroll pane to the panel
         add(scrollPane, BorderLayout.CENTER);
 
-//ADD BUTTON TODO: @Divynash2042 add functionality and UI component
+//ADD BUTTON
         // Create the add button
         addButton = new JButton("Add New");
         addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
@@ -259,7 +259,6 @@ public class P5_Employees extends JPanel {
                 } else {
                     try {
                         int employeeId = Integer.parseInt(employeeID);
-                        System.out.println("Parsed Employee ID: " + employeeId); // Debug statement
 
                         String firstName = firstNameField.getText();
                         String lastName = lastNameField.getText();
@@ -283,8 +282,6 @@ public class P5_Employees extends JPanel {
                         // Adding row in database
                         employee.addEmployee(employeeId, firstName, lastName, email, phone, address, dob, employmentStatus,
                                 username, password);
-
-                        // adding row in UI table
 
                         // Dispose the dialog window
                         frame.dispose();
