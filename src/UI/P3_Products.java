@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.sql.Connection;
 
 public class P3_Products extends JPanel {
@@ -69,7 +70,7 @@ public class P3_Products extends JPanel {
         // Add the scroll pane to the panel
         add(scrollPane, BorderLayout.CENTER);
 
-//ADD BUTTON TODO: @Divynash2042 add functionality and UI component
+//ADD BUTTON
         // Create the add button
         addButton = new JButton("Add New");
         addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
@@ -121,6 +122,18 @@ public class P3_Products extends JPanel {
             }
         });
 
+        // addButton action listener
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        showAddProductDialog();
+                    }
+                });
+            }
+        });
+
         // Add a document listener to the search field for real-time searching
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -168,7 +181,134 @@ public class P3_Products extends JPanel {
         }
     }
 
-    private void clearHighlight() {
-        table.clearSelection();
+    private void clearHighlight() { table.clearSelection();}
+    private void showAddProductDialog() {
+        JFrame frame = new JFrame("Add New Product");
+        frame.setSize(400, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel generalInfoPanel = new JPanel(new GridLayout(12, 2, 10, 10));
+        generalInfoPanel.setBorder(BorderFactory.createTitledBorder("General Information"));
+
+        generalInfoPanel.add(new JLabel("Product ID:"));
+        JTextField productIdField = new JTextField();
+        generalInfoPanel.add(productIdField);
+
+        generalInfoPanel.add(new JLabel("Product Name:"));
+        JTextField productNameField = new JTextField();
+        generalInfoPanel.add(productNameField);
+
+        generalInfoPanel.add(new JLabel("Category:"));
+        JTextField categoryField = new JTextField();
+        generalInfoPanel.add(categoryField);
+
+        generalInfoPanel.add(new JLabel("Cost Price:"));
+        JTextField costPriceField = new JTextField();
+        generalInfoPanel.add(costPriceField);
+
+        generalInfoPanel.add(new JLabel("Selling Price:"));
+        JTextField sellingPriceField = new JTextField();
+        generalInfoPanel.add(sellingPriceField);
+
+        generalInfoPanel.add(new JLabel("Quantity:"));
+        JTextField quantityField = new JTextField();
+        generalInfoPanel.add(quantityField);
+
+        generalInfoPanel.add(new JLabel("Minimum Stock Level:"));
+        JTextField minimumStockLevelField = new JTextField();
+        generalInfoPanel.add(minimumStockLevelField);
+
+        generalInfoPanel.add(new JLabel("Maximum Stock Level:"));
+        JTextField maximumStockLevelField = new JTextField();
+        generalInfoPanel.add(maximumStockLevelField);
+
+        generalInfoPanel.add(new JLabel("Reorder Point:"));
+        JTextField reorderPointField = new JTextField();
+        generalInfoPanel.add(reorderPointField);
+
+        generalInfoPanel.add(new JLabel("Manufacturer:"));
+        JTextField manufacturerField = new JTextField();
+        generalInfoPanel.add(manufacturerField);
+
+        generalInfoPanel.add(new JLabel("Manufacturer Code:"));
+        JTextField manufacturerCodeField = new JTextField();
+        generalInfoPanel.add(manufacturerCodeField);
+
+        generalInfoPanel.add(new JLabel("Lead Time:"));
+        JTextField leadTimeField = new JTextField();
+        generalInfoPanel.add(leadTimeField);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton addButton = new JButton("Add Product");
+
+        addButton.addActionListener(new ActionListener() {
+
+        public void actionPerformed(ActionEvent e) {
+            String productID = productIdField.getText();
+
+            if (productID.isEmpty()) {
+                String errorMessage = "Please fill all the fields.";
+                JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
+                // Dispose the dialog window
+                frame.dispose();
+            } else {
+                try {
+                    int productId = Integer.parseInt(productID);
+
+                    String productName = productNameField.getText();
+                    String category = categoryField.getText();
+                    BigDecimal costPrice = new BigDecimal(costPriceField.getText());
+                    BigDecimal sellingPrice = new BigDecimal(sellingPriceField.getText());
+                    int quantity = Integer.parseInt(quantityField.getText());
+                    int minimumStockLevel = Integer.parseInt(minimumStockLevelField.getText());
+                    int maximumStockLevel = Integer.parseInt(maximumStockLevelField.getText());
+                    int reorderPoint = Integer.parseInt(reorderPointField.getText());
+                    String manufacturer = manufacturerField.getText();
+                    String manufacturerCode = manufacturerCodeField.getText();
+                    int leadTime = Integer.parseInt(leadTimeField.getText());
+
+                    if (isNullOrEmpty(productName) || isNullOrEmpty(category) || isNullOrEmpty(costPriceField.getText())
+                            || isNullOrEmpty(sellingPriceField.getText()) || isNullOrEmpty(quantityField.getText())
+                            || isNullOrEmpty(minimumStockLevelField.getText()) || isNullOrEmpty(maximumStockLevelField.getText())
+                            || isNullOrEmpty(reorderPointField.getText()) || isNullOrEmpty(manufacturer) || isNullOrEmpty(manufacturerCode)
+                            || isNullOrEmpty(leadTimeField.getText())) {
+                        String errorMessage = "Please fill all the fields.";
+                        JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
+                        // Dispose the dialog window
+                        frame.dispose();
+                    }
+
+                    // Adding row in database
+                    product.addProduct(productId, productName, category, costPrice, sellingPrice, quantity, minimumStockLevel,
+                            maximumStockLevel, reorderPoint, manufacturer, manufacturerCode, leadTime, table, (DefaultTableModel) table.getModel());
+
+                    // Dispose the dialog window
+                    frame.dispose();
+                } catch (NumberFormatException ex) {
+                    String errorMessage = "Invalid Product ID or numeric field format. Please enter valid values.";
+                    JOptionPane.showMessageDialog(null, errorMessage, "Invalid Product Data", JOptionPane.ERROR_MESSAGE);
+                    // Dispose the dialog window
+                    frame.dispose();
+                }
+            }
+        }
+        });
+        buttonPanel.add(addButton);
+
+        panel.add(generalInfoPanel, BorderLayout.CENTER);
+        panel.add(addButton, BorderLayout.SOUTH);
+
+        frame.add(panel);
+        frame.setVisible(true);
     }
+
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
 }

@@ -75,8 +75,7 @@ public class P2_Retailers extends JPanel {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 //ADD BUTTON
-        if(userType.equals("Administrator"))
-        {
+        if(userType.equals("Administrator")) {
             // Create the add button
             addButton = new JButton("Add New");
             addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
@@ -299,7 +298,7 @@ public class P2_Retailers extends JPanel {
 
                         // Adding row in database
                         retailer.addRetailer(retailerId, retailerName, contactPerson, email, phone, address,
-                                shippingAddress, paymentTerms, preferredShippingMode, taxID, currentBalance);
+                                shippingAddress, paymentTerms, preferredShippingMode, taxID, currentBalance, table, (DefaultTableModel) table.getModel());
                         // Dispose the dialog window
                         frame.dispose();
                     } catch (NumberFormatException ex) {

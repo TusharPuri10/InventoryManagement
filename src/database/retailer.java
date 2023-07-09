@@ -5,8 +5,6 @@ import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.math.BigDecimal;
 
-import static UI.P5_Employees.table;
-
 public class retailer {
     private static String query;
     public static Object[][] getAllRetailers(String userType, Connection connection) {
@@ -52,7 +50,7 @@ public class retailer {
 
     public static void addRetailer(int retailerID, String retailerName, String contactPerson, String contactEmail, String contactPhone,
                                    String contactAddress, String shippingAddress, String paymentTerms, String preferredShippingMethod,
-                                   String taxID, BigDecimal currentBalance) {
+                                   String taxID, BigDecimal currentBalance, JTable table, DefaultTableModel model) {
         // Create an SQL INSERT statement for the retailers table
         String insertRetailerQuery = "INSERT INTO retailers (retailerID, retailerName, contactPerson, contactEmail, contactPhone, " +
                 "contactAddress, shippingAddress, paymentTerms, preferredShippingMethod, taxID, currentBalance) " +
@@ -93,7 +91,6 @@ public class retailer {
                 Object[][] newData = getAllRetailers("Administrator",connection);
 
                 // Update the table model with the new data
-                DefaultTableModel model = (DefaultTableModel) table.getModel();
                 model.setDataVector(newData, getTableHeaders());
                 model.fireTableDataChanged();
             }

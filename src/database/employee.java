@@ -6,8 +6,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import static UI.P5_Employees.table;
-
 public class employee {
     public static Object[][] getAllEmployees(Connection connection) {
         // SQL query to retrieve data from the "employee" table
@@ -45,8 +43,10 @@ public class employee {
         }
     }
 
+
+// Adding new employee
     public static void addEmployee(int employeeId, String firstName, String lastName, String email, String phone,
-                                   String address, String dob, String employmentStatus, String username, String password) {
+                                   String address, String dob, String employmentStatus, String username, String password, DefaultTableModel model) {
         // Create an SQL INSERT statement for the employees table
         String insertEmployeeQuery = "INSERT INTO employees (employeeID, firstName, lastName, Email, Phone, Address, DateofBirth, DateofJoining, Status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -126,7 +126,6 @@ public class employee {
                 Object[][] newData = getAllEmployees(connection);
 
                 // Update the table model with the new data
-                DefaultTableModel model = (DefaultTableModel) table.getModel();
                 model.setDataVector(newData, getTableHeaders());
                 model.fireTableDataChanged();
 
@@ -169,5 +168,52 @@ public class employee {
             throw new RuntimeException(e);
         }
     }
+
+    public static void deleteSelectedRow(int selectedRow, JTable table, DefaultTableModel model) {
+        // Get the key of the selected row (assuming it's stored in a column named "id")
+        Object rowKey = table.getValueAt(selectedRow, table.getColumnModel().getColumnIndex("Employee ID"));
+
+        // Perform the delete operation on the selected row
+        // ...
+
+        // Make a query to the database to delete the row
+        String deleteQueryEmp = "DELETE FROM employees WHERE employeeID = ?";
+        String deleteQueryUser = "DELETE FROM users WHERE userid = ?";
+
+        try (Connection connection = DatabaseConnection.getConn()) {
+
+            // Prepare the DELETE statement
+            PreparedStatement statementEmp = connection.prepareStatement(deleteQueryEmp);
+            PreparedStatement statementUser = connection.prepareStatement(deleteQueryUser);
+
+            // Set the key value in the prepared statement
+            statementEmp.setObject(1, rowKey);
+            statementUser.setObject(1, rowKey);
+
+            // Execute the delete query
+            int rowsAffectedEmp = statementEmp.executeUpdate();
+            int rowsAffectedUser = statementUser.executeUpdate();
+
+            statementEmp.close();
+            statementUser.close();
+
+            if (rowsAffectedEmp> 0 && rowsAffectedUser>0) {
+                // Retrieve the updated data from the database
+                Object[][] newData = getAllEmployees(connection);
+
+                // Update the table model with the new data
+                model.setDataVector(newData, getTableHeaders());
+                model.fireTableDataChanged();
+
+            }
+
+            // Handle any additional logic after deleting the row
+            // TODO: logs for delete
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }
