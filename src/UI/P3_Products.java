@@ -20,7 +20,7 @@ public class P3_Products extends JPanel {
     private JPanel searchPanel;
     private JPanel buttonPanel;
     private JScrollPane scrollPane;
-    private JButton addButton;
+    private JButton addButton,deleteButton,editButton;
     private JPanel topPanel;
     private String[] headers;
     private Object data[][];
@@ -69,19 +69,38 @@ public class P3_Products extends JPanel {
 
         // Add the scroll pane to the panel
         add(scrollPane, BorderLayout.CENTER);
+// Create a panel for the buttons and set its layout
+        buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Align the buttons to the right
 
-//ADD BUTTON
+// ADD BUTTON
+//        if (userType.equals("Administrator")) {
         // Create the add button
         addButton = new JButton("Add New");
         addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
         // Set the preferred size for the button
         addButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
-        // Create a panel for the button and set its layout
-        buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Align the button to the right
-        // Add the button to the panel
+        // Add the add button to the panel
         buttonPanel.add(addButton);
+//        }
+
+// DELETE BUTTON
+//        if (userType.equals("Administrator")) {
+        // Create the delete button
+        deleteButton = new JButton("Delete");
+        deleteButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
+        // Set the preferred size for the button
+        deleteButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
+        // Add the delete button to the panel
+        buttonPanel.add(deleteButton);
+//        }
+// EDIT BUTTON
+        editButton = new JButton("Edit");
+        editButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        editButton.setPreferredSize(new Dimension(140, 28));
+        buttonPanel.add(editButton);
+
 
 //SEARCH BUTTON and TEXT FIELD
         // Create the search panel
@@ -131,6 +150,33 @@ public class P3_Products extends JPanel {
                         showAddProductDialog();
                     }
                 });
+            }
+        });
+
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                int selectedColumn = table.getSelectedColumn();
+                if (selectedRow != -1 && selectedColumn != -1) {
+                    // Get the value of the selected cell
+                    Object cellValue = table.getValueAt(selectedRow, selectedColumn);
+                    // Perform the edit operation on the cellValue
+                    // ...
+                    // Update the table model or underlying data source if needed
+                    // ...
+                }
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Perform the delete operation on the selected row
+                    product.deleteSelectedRow(selectedRow,table,(DefaultTableModel) table.getModel());
+                }
             }
         });
 

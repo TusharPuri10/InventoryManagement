@@ -46,7 +46,7 @@ public class employee {
 
 // Adding new employee
     public static void addEmployee(int employeeId, String firstName, String lastName, String email, String phone,
-                                   String address, String dob, String employmentStatus, String username, String password, DefaultTableModel model) {
+                                   String address, String dob, String employmentStatus, String username, String password,JTable table, DefaultTableModel model) {
         // Create an SQL INSERT statement for the employees table
         String insertEmployeeQuery = "INSERT INTO employees (employeeID, firstName, lastName, Email, Phone, Address, DateofBirth, DateofJoining, Status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -129,6 +129,11 @@ public class employee {
                 model.setDataVector(newData, getTableHeaders());
                 model.fireTableDataChanged();
 
+                int[] columnWidths = {100, 150, 150, 180, 180, 120, 150, 120, 120};
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+                }
+
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -204,6 +209,11 @@ public class employee {
                 // Update the table model with the new data
                 model.setDataVector(newData, getTableHeaders());
                 model.fireTableDataChanged();
+
+                int[] columnWidths = {100, 150, 150, 180, 180, 120, 150, 120, 120};
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+                }
 
             }
 

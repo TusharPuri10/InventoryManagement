@@ -94,6 +94,11 @@ public class product {
                 // Update the table model with the new data
                 model.setDataVector(newData, getTableHeaders());
                 model.fireTableDataChanged();
+
+                int[] columnWidths = {100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -115,6 +120,51 @@ public class product {
             resultSet.next();
             int count = resultSet.getInt(1);
             return count > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void deleteSelectedRow(int selectedRow, JTable table, DefaultTableModel model) {
+        // Get the key of the selected row (assuming it's stored in a column named "id")
+        Object rowKey = table.getValueAt(selectedRow, table.getColumnModel().getColumnIndex("Product ID"));
+
+        // Perform the delete operation on the selected row
+        // ...
+
+        // Make a query to the database to delete the row
+        String deleteQuery = "DELETE FROM  inventory WHERE productID = ?";
+
+        try (Connection connection = DatabaseConnection.getConn()) {
+
+            // Prepare the DELETE statement
+            PreparedStatement statement = connection.prepareStatement(deleteQuery);
+
+            // Set the key value in the prepared statement
+            statement.setObject(1, rowKey);
+
+            // Execute the delete query
+            int rowsAffected = statement.executeUpdate();
+
+            statement.close();
+
+            if (rowsAffected> 0) {
+                // Retrieve the updated data from the database
+                Object[][] newData = getAllproducts("Administrator",connection);
+
+                // Update the table model with the new data
+                model.setDataVector(newData, getTableHeaders());
+                model.fireTableDataChanged();
+
+                int[] columnWidths = {100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120, 120};
+                for (int i = 0; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+                }
+
+            }
+
+            // Handle any additional logic after deleting the row
+            // TODO: logs for delete
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

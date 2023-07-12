@@ -332,7 +332,7 @@ public class P5_Employees extends JPanel {
 
                         // Adding row in database
                         employee.addEmployee(employeeId, firstName, lastName, email, phone, address, dob, employmentStatus,
-                                username, password,(DefaultTableModel) table.getModel());
+                                username, password,table,(DefaultTableModel) table.getModel());
 
                         // Dispose the dialog window
                         frame.dispose();
