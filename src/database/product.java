@@ -47,7 +47,7 @@ public class product {
         }
     }
 
-    public static int addProduct(int productID, String productName, String category, BigDecimal costPrice,
+    public static int addProduct(Connection connection,int productID, String productName, String category, BigDecimal costPrice,
                                   BigDecimal sellingPrice, int quantity, int minimumStockLevel, int maximumStockLevel,
                                   int reorderPoint, String manufacturer, String manufacturerCode, int leadTime,
                                   JTable table, DefaultTableModel model) {
@@ -63,7 +63,7 @@ public class product {
             return 1;
         }
 
-        try (Connection connection = DatabaseConnection.getConn()) {
+        try {
             // Prepare the INSERT statement
             PreparedStatement insertProductStatement = connection.prepareStatement(insertProductQuery);
 
@@ -125,7 +125,7 @@ public class product {
             throw new RuntimeException(e);
         }
     }
-    public static void deleteSelectedRow(int selectedRow, JTable table, DefaultTableModel model) {
+    public static void deleteSelectedRow(Connection connection, int selectedRow, JTable table, DefaultTableModel model) {
         // Get the key of the selected row (assuming it's stored in a column named "id")
         Object rowKey = table.getValueAt(selectedRow, table.getColumnModel().getColumnIndex("Product ID"));
 
@@ -135,7 +135,7 @@ public class product {
         // Make a query to the database to delete the row
         String deleteQuery = "DELETE FROM  inventory WHERE productID = ?";
 
-        try (Connection connection = DatabaseConnection.getConn()) {
+        try {
 
             // Prepare the DELETE statement
             PreparedStatement statement = connection.prepareStatement(deleteQuery);
@@ -171,9 +171,68 @@ public class product {
         }
     }
 
-    public static void sellProduct(int quantity, int selectedProduct, int selectedRetailer)
-    {
+    public static void sellProduct(Connection connection, int quantity, int selectedProduct, int selectedRetailer, String username, int userid,JTable table, DefaultTableModel model) throws SQLException {
+        // Get the key of the selected row (assuming it's stored in a column named "id")
+        Object rowKey = table.getValueAt(selectedProduct, table.getColumnModel().getColumnIndex("Product ID"));
+        query = new String("SELECT * FROM inventory WHERE productID=?");
+        try{
+            PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            statement.setObject(1, rowKey);
+            // Execute the query and get the result set
+            ResultSet resultSet = statement.executeQuery();
+// Check if the result set is not empty
+            if (resultSet.next()) {
+                // Get the values from the result set for the product to be sold
+                int productId = resultSet.getInt("productID");
+                String productName = resultSet.getString("productName");
+                String category = resultSet.getString("category");
+                BigDecimal costPrice = resultSet.getBigDecimal("costPrice");
+                BigDecimal sellingPrice = resultSet.getBigDecimal("sellingPrice");
+                int leadTime = resultSet.getInt("leadTime");
 
-    }
+                // Insert the sold product into the products_sold table
+                String insertQuery = "INSERT INTO products_sold (productID, productName, category, costPrice, sellingPrice, quantity, leadTime, retailerID, employeeID, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                    insertStatement.setInt(1, productId);
+                    insertStatement.setString(2, productName);
+                    insertStatement.setString(3, category);
+                    insertStatement.setBigDecimal(4, costPrice);
+                    insertStatement.setBigDecimal(5, sellingPrice);
+                    insertStatement.setInt(6, quantity);
+                    insertStatement.setInt(7, leadTime);
+                    insertStatement.setInt(8, selectedRetailer);
+                    insertStatement.setInt(9, userid);
+                    insertStatement.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+
+                    // Execute the INSERT operation
+                    int rowsInserted = insertStatement.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("Product sold and inserted successfully.");
+                        // Decrease the quantity of the sold product in the inventory
+                        int currentQuantity = resultSet.getInt("quantity");
+                        int newQuantity = currentQuantity - quantity;
+                        String updateQuery = "UPDATE inventory SET quantity=? WHERE productID=?";
+                        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                            updateStatement.setInt(1, newQuantity);
+                            updateStatement.setInt(2, productId);
+                            int rowsUpdated = updateStatement.executeUpdate();
+                            if (rowsUpdated > 0) {
+                                System.out.println("Inventory quantity updated.");
+                                // Update the table model to reflect the updated inventory quantity
+                                model.setValueAt(newQuantity, selectedProduct, table.getColumnModel().getColumnIndex("quantity"));
+                            }
+                        }
+                    } else {
+                        System.out.println("Failed to insert product sold.");
+                    }
+                }
+            } else {
+                System.out.println("Product not found in the inventory.");
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        }
 
 }

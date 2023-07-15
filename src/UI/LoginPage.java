@@ -124,7 +124,25 @@ public class LoginPage extends JFrame {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    P0_UI_Main mainPage = new P0_UI_Main(userType,connection);
+                    String queryUserID = "SELECT userid FROM users WHERE username = ?";
+                    PreparedStatement statementUserID = connection.prepareStatement(queryUserID);
+                    statementUserID.setString(1, username);
+                    ResultSet resultSetUserID = statementUserID.executeQuery();
+                    int userId = -1;
+                    if (resultSetUserID.next()) {
+                        userId = resultSetUserID.getInt("userid");
+                    } else {
+                        // Close the ResultSet and the PreparedStatement before throwing the exception
+                        resultSetUserID.close();
+                        statementUserID.close();
+
+                        throw new RuntimeException("User ID not found for username: " + username);
+                    }
+                    // Close the ResultSet and the PreparedStatement after use
+                    resultSetUserID.close();
+                    statementUserID.close();
+
+                    P0_UI_Main mainPage = new P0_UI_Main(userType,username,userId,connection);
                     mainPage.setVisible(true);
                     dispose(); // Close the login page
                 }

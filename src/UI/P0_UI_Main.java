@@ -17,7 +17,7 @@ public class P0_UI_Main extends JFrame {
     private JPanel logsPanel;
     public static JButton selectButton;
 
-    public P0_UI_Main(String userType,Connection connection) {
+    public P0_UI_Main(String userType,String username, int userid, Connection connection) {
         setTitle(userType + " Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(800, 500));
@@ -69,11 +69,11 @@ public class P0_UI_Main extends JFrame {
         contentPanel = new JPanel(new CardLayout());
         contentPanel.setBackground(Color.WHITE);
 
-        homePanel = new P1_Home();
+        homePanel = new P1_Home(username);
         retailersPanel = new P2_Retailers(connection);
-        employeesPanel = new P5_Employees(connection);
-        productsPanel = new P3_Products(userType,connection);
-        logsPanel = new P4_Logs();
+        employeesPanel = new P5_Employees(connection,username,userid);
+        productsPanel = new P3_Products(userType,connection,username,userid);
+        logsPanel = new P4_Logs(userid,username,userType);
 
         contentPanel.add(homePanel, "Home");
         contentPanel.add(retailersPanel, "Retailers");

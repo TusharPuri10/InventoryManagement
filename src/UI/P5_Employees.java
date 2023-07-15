@@ -23,7 +23,11 @@ public class P5_Employees extends JPanel {
     private JFormattedTextField dobField;
 
     private Object[][] data; // Stores the retrieved data
-    public P5_Employees(Connection connection) {
+    int userid;
+    String username;
+    public P5_Employees(Connection connection, String username, int userid) {
+        this.username = username;
+        this.userid = userid;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 

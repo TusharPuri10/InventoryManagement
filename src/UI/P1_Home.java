@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class P1_Home extends JPanel {
-    public P1_Home() {
+    public P1_Home(String username) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -35,7 +35,7 @@ public class P1_Home extends JPanel {
             }
         });
 
-        JLabel titleLabel = new JLabel("Welcome"); // TODO: Add name of the employee here
+        JLabel titleLabel = new JLabel("Welcome " + username);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Align label to the center
         titleLabel.setVerticalAlignment(SwingConstants.TOP); // Align label to the top

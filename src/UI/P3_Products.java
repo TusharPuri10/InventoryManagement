@@ -12,10 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class P3_Products extends JPanel {
     private JTextField searchField;
-    private JTable table;
+    private static JTable table;
     private JButton clearButton;
     private JPanel searchPanel;
     private JPanel buttonPanel;
@@ -25,8 +26,14 @@ public class P3_Products extends JPanel {
     private String[] headers;
     private Object data[][];
     private int[] columnWidths;
+    static String username;
+    static int userid;
+    static Connection connection;
 
-    public P3_Products(String userType, Connection connection) {
+    public P3_Products(String userType, Connection connection,String username, int userid) {
+        this.connection = connection;
+        this.userid = userid;
+        this.username = username;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -155,7 +162,7 @@ public class P3_Products extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            showAddProductDialog();
+                            showAddProductDialog(connection);
                         }
                     });
                 }
@@ -194,7 +201,7 @@ public class P3_Products extends JPanel {
                             });
                         }
                         else {
-                            product.deleteSelectedRow(selectedRow, table, (DefaultTableModel) table.getModel());
+                            product.deleteSelectedRow(connection,selectedRow, table, (DefaultTableModel) table.getModel());
                         }
                     }
                 }
@@ -247,7 +254,9 @@ public class P3_Products extends JPanel {
     }
 
     private void clearHighlight() { table.clearSelection();}
-    private void showAddProductDialog() {
+
+    //addProduct
+    private void showAddProductDialog(Connection connection) {
         JFrame frame = new JFrame("Add New Product");
         frame.setSize(400, 500);
         frame.setLocationRelativeTo(null);
@@ -337,17 +346,17 @@ public class P3_Products extends JPanel {
                         JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
                         // Dispose the dialog window
                         frame.dispose();
-                        showAddProductDialog();
+                        showAddProductDialog(connection);
                     }
                     else
                     {
                         // Adding row in database
                         int productId = Integer.parseInt(productID);
-                        if(product.addProduct(productId, productName, category, costPrice, sellingPrice, quantity, minimumStockLevel,
+                        if(product.addProduct(connection,productId, productName, category, costPrice, sellingPrice, quantity, minimumStockLevel,
                                 maximumStockLevel, reorderPoint, manufacturer, manufacturerCode, leadTime, table, (DefaultTableModel) table.getModel())==1)
                         {
                             frame.dispose();
-                            showAddProductDialog();
+                            showAddProductDialog(connection);
                         }
                         else{
                             // Dispose the dialog window
@@ -359,7 +368,7 @@ public class P3_Products extends JPanel {
                     JOptionPane.showMessageDialog(null, errorMessage, "Invalid field input format", JOptionPane.ERROR_MESSAGE);
                     // Dispose the dialog window
                     frame.dispose();
-                    showAddProductDialog();
+                    showAddProductDialog(connection);
                 }
             }
         });
@@ -372,6 +381,7 @@ public class P3_Products extends JPanel {
         frame.setVisible(true);
     }
 
+    //sellButton
     private void sellProductDialog(int selectedProduct){
         Thread t1 = new Thread(new Runnable() {
             @Override
@@ -420,7 +430,11 @@ public class P3_Products extends JPanel {
 
             // Perform the sell operation using the selected product, retailer, and quantity
             // ...
-            product.sellProduct(quantity,selectedProduct,selectedRetailer);
+            try {
+                product.sellProduct(connection,quantity,selectedProduct,selectedRetailer,username,userid,table,(DefaultTableModel) table.getModel());
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
 
             // Close the sell dialog
             sellDialog.dispose();

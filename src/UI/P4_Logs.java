@@ -3,7 +3,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class P4_Logs extends JPanel {
-    public P4_Logs() {
+    int userid;
+    String username;
+    String usertype;
+    public P4_Logs(int userid, String username, String usertype) {
+        this.userid = userid;
+        this.username = username;
+        this.usertype = usertype;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
