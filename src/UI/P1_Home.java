@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class P1_Home extends JPanel {
-    public P1_Home() { //TODO: send user type as parameter and then display roles according to the user type on home page
+    public P1_Home() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 

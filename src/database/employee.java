@@ -45,7 +45,7 @@ public class employee {
 
 
 // Adding new employee
-    public static void addEmployee(int employeeId, String firstName, String lastName, String email, String phone,
+    public static int addEmployee(int employeeId, String firstName, String lastName, String email, String phone,
                                    String address, String dob, String employmentStatus, String username, String password,JTable table, DefaultTableModel model) {
         // Create an SQL INSERT statement for the employees table
         String insertEmployeeQuery = "INSERT INTO employees (employeeID, firstName, lastName, Email, Phone, Address, DateofBirth, DateofJoining, Status) " +
@@ -55,14 +55,14 @@ public class employee {
         if(isUserIdExists(employeeId)){
             String errorMessage = "User ID already exists. Please choose a different User ID.";
             JOptionPane.showMessageDialog(null, errorMessage, "Duplicate User ID", JOptionPane.ERROR_MESSAGE);
-            return;
+            return 1;
         }
 
         //is username exists
         if(isUsernameExists(username)){
             String errorMessage = "User ID already exists. Please choose a different User ID.";
             JOptionPane.showMessageDialog(null, errorMessage, "Duplicate User ID", JOptionPane.ERROR_MESSAGE);
-            return;
+            return 1;
         }
 
 
@@ -78,7 +78,7 @@ public class employee {
             insertUserStatement.setInt(1, employeeId);
             insertUserStatement.setString(2, username);
             insertUserStatement.setString(3, password);
-            insertUserStatement.setString(4, "employee");
+            insertUserStatement.setString(4, "Employee");
 
             // Execute the INSERT statement for users
 
@@ -105,7 +105,7 @@ public class employee {
             } catch (DateTimeParseException e) {
                 String errorMessage = "Invalid date format for Date of Birth. Please use yyyy-MM-dd format.";
                 JOptionPane.showMessageDialog(null, errorMessage, "Invalid Date", JOptionPane.ERROR_MESSAGE);
-                return;
+                return 1;
             }
             insertEmployeeStatement.setDate(7, Date.valueOf(dobDate));
 
@@ -138,6 +138,7 @@ public class employee {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return 0;
     }
 
 
@@ -218,7 +219,7 @@ public class employee {
             }
 
             // Handle any additional logic after deleting the row
-            // TODO: logs for delete
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

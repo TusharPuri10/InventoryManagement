@@ -27,7 +27,7 @@ public class P5_Employees extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // Table headers
+// Table headers
         String[] headers = {"Employee ID", "First Name", "Last Name",
                 "Contact Email", "Contact Phone", "Address", "Date of Birth", "Date of Joining",
                 "Employment Status"};
@@ -37,7 +37,7 @@ public class P5_Employees extends JPanel {
             data = employee.getAllEmployees(connection);
         }
 
-        // Create a table model with the data
+// Create a table model with the data
         DefaultTableModel model = new DefaultTableModel(data, headers);
 
         // Create the table with the model
@@ -69,7 +69,7 @@ public class P5_Employees extends JPanel {
 // ADD BUTTON
 //        if (userType.equals("Administrator")) {
             // Create the add button
-            addButton = new JButton("Add New");
+            addButton = new JButton("Hire");
             addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
             // Set the preferred size for the button
             addButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
@@ -77,10 +77,10 @@ public class P5_Employees extends JPanel {
             buttonPanel.add(addButton);
 //        }
 
-// DELETE BUTTON
+// DELETE BUTTON TODO: add logic of adding this info to logs
 //        if (userType.equals("Administrator")) {
             // Create the delete button
-            deleteButton = new JButton("Delete");
+            deleteButton = new JButton("Remove");
             deleteButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
             // Set the preferred size for the button
             deleteButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
@@ -133,7 +133,7 @@ public class P5_Employees extends JPanel {
             }
         });
 
-        // addButton action listener
+// addButton action listener
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -144,7 +144,7 @@ public class P5_Employees extends JPanel {
                 });
             }
         });
-
+// editButton action listener
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,6 +160,8 @@ public class P5_Employees extends JPanel {
                 }
             }
         });
+        
+// deleteButton action listener
 
         deleteButton.addActionListener(new ActionListener() {
             @Override
@@ -300,17 +302,8 @@ public class P5_Employees extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String employeeID = employeeIdField.getText();
-
-                if (employeeID.isEmpty()) {
-                    String errorMessage = "Please fill all the fields.";
-                    JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
-                    // Dispose the dialog window
-                    frame.dispose();
-                } else {
                     try {
-                        int employeeId = Integer.parseInt(employeeID);
-
+                        String employeeID = employeeIdField.getText();
                         String firstName = firstNameField.getText();
                         String lastName = lastNameField.getText();
                         String email = emailField.getText();
@@ -321,29 +314,38 @@ public class P5_Employees extends JPanel {
                         String username = usernameField.getText();
                         String password = new String(passwordField.getPassword());
 
-                        if (isNullOrEmpty(firstName) || isNullOrEmpty(lastName) || isNullOrEmpty(email) || isNullOrEmpty(phone)
+                        if (isNullOrEmpty(employeeID)  || isNullOrEmpty(firstName) || isNullOrEmpty(lastName) || isNullOrEmpty(email) || isNullOrEmpty(phone)
                                 || isNullOrEmpty(address) || isNullOrEmpty(dob) || isNullOrEmpty(employmentStatus)
                                 || isNullOrEmpty(username) || isNullOrEmpty(password)) {
                             String errorMessage = "Please fill all the fields.";
                             JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
                             // Dispose the dialog window
                             frame.dispose();
+                            showAddEmployeeDialog();
                         }
-
-                        // Adding row in database
-                        employee.addEmployee(employeeId, firstName, lastName, email, phone, address, dob, employmentStatus,
-                                username, password,table,(DefaultTableModel) table.getModel());
-
-                        // Dispose the dialog window
-                        frame.dispose();
+                        else
+                        {
+                            // Adding row in database
+                            int employeeId = Integer.parseInt(employeeID);
+                            if(employee.addEmployee(employeeId, firstName, lastName, email, phone, address, dob, employmentStatus,
+                                    username, password,table,(DefaultTableModel) table.getModel())==1)
+                            {
+                                frame.dispose();
+                                showAddEmployeeDialog();
+                            }
+                            else{
+                                // Dispose the dialog window
+                                frame.dispose();
+                            }
+                        }
                     } catch (NumberFormatException ex) {
-                        String errorMessage = "Invalid Employee ID format. Please enter a valid integer.";
-                        JOptionPane.showMessageDialog(null, errorMessage, "Invalid Employee ID", JOptionPane.ERROR_MESSAGE);
+                        String errorMessage = "Invalid field input format. Please enter a valid input.";
+                        JOptionPane.showMessageDialog(null, errorMessage, "Invalid field input format", JOptionPane.ERROR_MESSAGE);
                         // Dispose the dialog window
                         frame.dispose();
+                        showAddEmployeeDialog();
                     }
                 }
-            }
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

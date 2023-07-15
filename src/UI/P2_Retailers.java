@@ -21,24 +21,21 @@ public class P2_Retailers extends JPanel {
     private JPanel searchPanel;
     private JPanel buttonPanel;
     private JScrollPane scrollPane;
-    private JButton addButton;
+    private JButton addButton,deleteButton,editButton;
     private JPanel topPanel;
     private String[] headers;
     private Object data[][];
     private int[] columnWidths;
 
-    public P2_Retailers(String userType, Connection connection) {
+    public P2_Retailers(Connection connection) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        if(userType.equals("Administrator"))
             headers = new String[]{"Retailer ID", "Retailer Name", "Contact Person", "Contact Email", "Contact Phone", "Contact Address", "Shipping Address", "Payment Terms", "Preferred Shipping Method", "Tax ID", "Current Balance"};
-        else
-            headers = new String[]{"Retailer ID", "Retailer Name", "Contact Person", "Contact Email", "Contact Phone", "Contact Address", "Shipping Address","Preferred Shipping Method"};
 
         // Retrieve data from MySQL database if not already retrieved
         if (data == null) {
-            data = retailer.getAllRetailers(userType, connection);
+            data = retailer.getAllRetailers(connection);
         }
 
 
@@ -52,10 +49,7 @@ public class P2_Retailers extends JPanel {
         table.setRowHeight(25); // Set row height
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto resizing of columns
 
-        if(userType.equals("Administrator"))
             columnWidths = new int[]{100, 150, 150, 200, 120, 180, 180, 120, 150, 120, 120};
-        else
-            columnWidths = new int[]{100, 150, 150, 180, 180, 120, 150, 120};
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }
@@ -75,7 +69,6 @@ public class P2_Retailers extends JPanel {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
 //ADD BUTTON
-        if(userType.equals("Administrator")) {
             // Create the add button
             addButton = new JButton("Add New");
             addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
@@ -87,7 +80,22 @@ public class P2_Retailers extends JPanel {
             buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Align the button to the right
             // Add the button to the panel
             buttonPanel.add(addButton);
-        }
+
+// DELETE BUTTON
+
+        // Create the delete button
+        deleteButton = new JButton("Delete");
+        deleteButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
+        // Set the preferred size for the button
+        deleteButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
+        // Add the delete button to the panel
+        buttonPanel.add(deleteButton);
+
+// EDIT BUTTON
+        editButton = new JButton("Edit");
+        editButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        editButton.setPreferredSize(new Dimension(140, 28));
+        buttonPanel.add(editButton);
 
 //SEARCH BUTTON and TEXT FIELD
         // Create the search panel
@@ -110,17 +118,10 @@ public class P2_Retailers extends JPanel {
 
 // Create a container panel to hold both the button panel and search panel
         topPanel = new JPanel(new BorderLayout());
-        if(userType.equals("Administrator"))
-        {
             topPanel.add(buttonPanel, BorderLayout.EAST);
             topPanel.add(searchPanel, BorderLayout.WEST);
             // Add the top panel to the top of the main panel
             add(topPanel, BorderLayout.NORTH);
-        }
-        else
-        {
-            add(searchPanel, BorderLayout.NORTH);
-        }
 
 
         clearButton.addActionListener(new ActionListener() {
@@ -136,8 +137,6 @@ public class P2_Retailers extends JPanel {
         });
 
         // addButton action listener
-        if(userType.equals("Administrator"))
-        {
             addButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -149,28 +148,53 @@ public class P2_Retailers extends JPanel {
                 }
             });
 
-            // Add a document listener to the search field for real-time searching
-            searchField.getDocument().addDocumentListener(new DocumentListener() {
+            // editButton action listener
+            editButton.addActionListener(new ActionListener() {
                 @Override
-                public void insertUpdate(DocumentEvent e) {
-                    searchAndHighlight();
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    searchAndHighlight();
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    searchAndHighlight();
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    int selectedColumn = table.getSelectedColumn();
+                    if (selectedRow != -1 && selectedColumn != -1) {
+                        // Get the value of the selected cell
+                        Object cellValue = table.getValueAt(selectedRow, selectedColumn);
+                        // Perform the edit operation on the cellValue
+                        // ...
+                        // Update the table model or underlying data source if needed
+                        // ...
+                    }
                 }
             });
-        }
+            // deleteButton action listener
+                deleteButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int selectedRow = table.getSelectedRow();
+                        if (selectedRow != -1) {
+                            // Perform the delete operation on the selected row
+                            retailer.deleteSelectedRow(selectedRow, table, (DefaultTableModel) table.getModel());
+                        }
+                    }
+                });
 
-//        pack(); Used if I Extended JFrame
+        // Add a document listener to the search field for real-time searching
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchAndHighlight();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchAndHighlight();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchAndHighlight();
+            }
+        });
+
         setVisible(true);
-
     }
 
     private void searchAndHighlight() {
@@ -263,17 +287,9 @@ public class P2_Retailers extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String retailerID = retailerIdField.getText();
-
-                if (retailerID.isEmpty()) {
-                    String errorMessage = "Please fill all the fields.";
-                    JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
-                    // Dispose the dialog window
-                    frame.dispose();
-                } else {
                     try {
-                        int retailerId = Integer.parseInt(retailerID);
 
+                        String retailerID = retailerIdField.getText();
                         String retailerName = retailerNameField.getText();
                         String contactPerson = contactPersonField.getText();
                         String email = emailField.getText();
@@ -287,33 +303,43 @@ public class P2_Retailers extends JPanel {
 
 
 
-                        if (isNullOrEmpty(retailerName) || isNullOrEmpty(contactPerson) || isNullOrEmpty(email) || isNullOrEmpty(phone)
+                        if (isNullOrEmpty(retailerID) || isNullOrEmpty(retailerName) || isNullOrEmpty(contactPerson) || isNullOrEmpty(email) || isNullOrEmpty(phone)
                                 || isNullOrEmpty(address) || isNullOrEmpty(shippingAddress) || isNullOrEmpty(paymentTerms)
                                 || isNullOrEmpty(preferredShippingMode) || isNullOrEmpty(taxID)) {
                             String errorMessage = "Please fill all the fields.";
                             JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
                             // Dispose the dialog window
                             frame.dispose();
+                            showAddRetailerDialog();
+                        }
+                        else
+                        {
+                            // Adding row in database
+                            int retailerId = Integer.parseInt(retailerID);
+                            if(retailer.addRetailer(retailerId, retailerName, contactPerson, email, phone, address,
+                                    shippingAddress, paymentTerms, preferredShippingMode, taxID, currentBalance, table, (DefaultTableModel) table.getModel()) == 1){
+                                frame.dispose();
+                                showAddRetailerDialog();
+                            }
+                            else {
+                                // Dispose the dialog window
+                                frame.dispose();
+                            }
                         }
 
-                        // Adding row in database
-                        retailer.addRetailer(retailerId, retailerName, contactPerson, email, phone, address,
-                                shippingAddress, paymentTerms, preferredShippingMode, taxID, currentBalance, table, (DefaultTableModel) table.getModel());
-                        // Dispose the dialog window
-                        frame.dispose();
                     } catch (NumberFormatException ex) {
-                        String errorMessage = "Invalid Employee ID format. Please enter a valid integer.";
-                        JOptionPane.showMessageDialog(null, errorMessage, "Invalid Employee ID", JOptionPane.ERROR_MESSAGE);
+                        String errorMessage = "Invalid field input format. Please enter a valid input.";
+                        JOptionPane.showMessageDialog(null, errorMessage, "Invalid field input format", JOptionPane.ERROR_MESSAGE);
                         // Dispose the dialog window
                         frame.dispose();
+                        showAddRetailerDialog();
                     }
                 }
-            }
         });
 
         buttonPanel.add(addButton);
 
-        panel.add(generalInfoPanel, BorderLayout.NORTH);
+        panel.add(generalInfoPanel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.add(panel);
@@ -327,4 +353,6 @@ public class P2_Retailers extends JPanel {
     private void clearHighlight() {
         table.clearSelection();
     }
+
+
 }

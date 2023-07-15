@@ -7,8 +7,8 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 
 public class P0_UI_Main extends JFrame {
-    private JPanel sidePanel;
-    private JPanel contentPanel;
+    private static JPanel sidePanel;
+    private static JPanel contentPanel;
 
     private JPanel homePanel;
     private JPanel employeesPanel;
@@ -65,7 +65,7 @@ public class P0_UI_Main extends JFrame {
         contentPanel.setBackground(Color.WHITE);
 
         homePanel = new P1_Home();
-        retailersPanel = new P2_Retailers(userType,connection);
+        retailersPanel = new P2_Retailers(connection);
         employeesPanel = new P5_Employees(connection);
         productsPanel = new P3_Products(userType,connection);
         logsPanel = new P4_Logs();
@@ -78,12 +78,12 @@ public class P0_UI_Main extends JFrame {
         contentPanel.add(logsPanel, "Logs");
 
         // Add action listeners to the buttons
-        homeButton.addActionListener(new PageButtonActionListener("Home"));
-        retailersButton.addActionListener(new PageButtonActionListener("Retailers"));
+        homeButton.addActionListener(new PageButtonActionListener("Home",0));
+        retailersButton.addActionListener(new PageButtonActionListener("Retailers",0));
         if(userType=="Administrator")
-            employeesButton.addActionListener(new PageButtonActionListener("Employees"));
-        productsButton.addActionListener(new PageButtonActionListener("Products"));
-        logsButton.addActionListener(new PageButtonActionListener("Logs"));
+            employeesButton.addActionListener(new PageButtonActionListener("Employees",0));
+        productsButton.addActionListener(new PageButtonActionListener("Products",0));
+        logsButton.addActionListener(new PageButtonActionListener("Logs",0));
 
         // Add the side panel and content panel to the frame
         getContentPane().add(sidePanel, BorderLayout.WEST);
@@ -102,11 +102,12 @@ public class P0_UI_Main extends JFrame {
         return button;
     }
 
-    private class PageButtonActionListener implements ActionListener {
+    static class PageButtonActionListener implements ActionListener {
         private String page;
-
-        public PageButtonActionListener(String page) {
+        private int selectionMode;
+        public PageButtonActionListener(String page, int selectionMode) {
             this.page = page;
+            this.selectionMode = selectionMode;
         }
 
         @Override
@@ -115,7 +116,8 @@ public class P0_UI_Main extends JFrame {
             cardLayout.show(contentPanel, page);
 
             // Highlight the selected button
-            highlightButton((JButton) e.getSource());
+            if(selectionMode==0)
+                highlightButton((JButton) e.getSource());
         }
 
         private void highlightButton(JButton selectedButton) {

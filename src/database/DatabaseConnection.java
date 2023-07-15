@@ -9,7 +9,7 @@ public class DatabaseConnection {
         Connection conn = null;
 
         try {
-            conn = DriverManager.getConnection(url, "azureuser", "graphicera@123"); //TODO - dont store database user and password in plain text @kartik
+            conn = DriverManager.getConnection(url, "azureuser", "graphicera@123"); //TODO - dont store database user and password in plain text
         } catch (SQLException e) {
             e.printStackTrace();
         }

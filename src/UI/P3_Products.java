@@ -74,33 +74,40 @@ public class P3_Products extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT)); // Align the buttons to the right
 
-// ADD BUTTON
-//        if (userType.equals("Administrator")) {
+// PURCHASE BUTTON
+       if (userType.equals("Administrator")) {
         // Create the add button
-        addButton = new JButton("Add New");
+        addButton = new JButton("Purchase");
         addButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
         // Set the preferred size for the button
         addButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
         // Add the add button to the panel
         buttonPanel.add(addButton);
-//        }
+        }
+
 
 // DELETE BUTTON
-//        if (userType.equals("Administrator")) {
-        // Create the delete button
-        deleteButton = new JButton("Delete");
+        String text ;
+        if (userType.equals("Administrator")) {
+            text = "Delete";
+        }
+        else
+            text = "Sell";
+         //Create the delete button
+        deleteButton = new JButton(text);
         deleteButton.setFont(new Font("Arial", Font.PLAIN, 14)); // Increase the font size
         // Set the preferred size for the button
         deleteButton.setPreferredSize(new Dimension(140, 28)); // Adjust the size as needed
         // Add the delete button to the panel
         buttonPanel.add(deleteButton);
-//        }
-// EDIT BUTTON
-        editButton = new JButton("Edit");
-        editButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        editButton.setPreferredSize(new Dimension(140, 28));
-        buttonPanel.add(editButton);
 
+// EDIT BUTTON
+        if (userType.equals("Administrator")) {
+            editButton = new JButton("Edit");
+            editButton.setFont(new Font("Arial", Font.PLAIN, 14));
+            editButton.setPreferredSize(new Dimension(140, 28));
+            buttonPanel.add(editButton);
+        }
 
 //SEARCH BUTTON and TEXT FIELD
         // Create the search panel
@@ -141,44 +148,57 @@ public class P3_Products extends JPanel {
             }
         });
 
-        // addButton action listener
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        showAddProductDialog();
+        if (userType.equals("Administrator")) {
+            // addButton action listener
+            addButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            showAddProductDialog();
+                        }
+                    });
+                }
+            });
+            // editButton action listener
+
+            editButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    int selectedColumn = table.getSelectedColumn();
+                    if (selectedRow != -1 && selectedColumn != -1) {
+                        // Get the value of the selected cell
+                        Object cellValue = table.getValueAt(selectedRow, selectedColumn);
+                        // Perform the edit operation on the cellValue
+                        // ...
+                        // Update the table model or underlying data source if needed
+                        // ...
                     }
-                });
-            }
-        });
-
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                int selectedColumn = table.getSelectedColumn();
-                if (selectedRow != -1 && selectedColumn != -1) {
-                    // Get the value of the selected cell
-                    Object cellValue = table.getValueAt(selectedRow, selectedColumn);
-                    // Perform the edit operation on the cellValue
-                    // ...
-                    // Update the table model or underlying data source if needed
-                    // ...
                 }
-            }
-        });
+            });
+        }
+            // deleteButton action listener
 
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Perform the delete operation on the selected row
-                    product.deleteSelectedRow(selectedRow,table,(DefaultTableModel) table.getModel());
+            deleteButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow != -1) {
+                        // Perform the delete operation on the selected row
+                        if(userType.equals("Employee"))
+                        {
+                            SwingUtilities.invokeLater(new Runnable() { public void run() {
+                                    sellProductDialog(selectedRow);
+                                }
+                            });
+                        }
+                        else {
+                            product.deleteSelectedRow(selectedRow, table, (DefaultTableModel) table.getModel());
+                        }
+                    }
                 }
-            }
-        });
+            });
 
         // Add a document listener to the search field for real-time searching
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -198,7 +218,6 @@ public class P3_Products extends JPanel {
             }
         });
 
-//        pack(); Used if I Extended JFrame
         setVisible(true);
 
     }
@@ -295,17 +314,8 @@ public class P3_Products extends JPanel {
         addButton.addActionListener(new ActionListener() {
 
         public void actionPerformed(ActionEvent e) {
-            String productID = productIdField.getText();
-
-            if (productID.isEmpty()) {
-                String errorMessage = "Please fill all the fields.";
-                JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
-                // Dispose the dialog window
-                frame.dispose();
-            } else {
                 try {
-                    int productId = Integer.parseInt(productID);
-
+                    String productID = productIdField.getText();
                     String productName = productNameField.getText();
                     String category = categoryField.getText();
                     BigDecimal costPrice = new BigDecimal(costPriceField.getText());
@@ -327,22 +337,31 @@ public class P3_Products extends JPanel {
                         JOptionPane.showMessageDialog(null, errorMessage, "Empty Fields", JOptionPane.ERROR_MESSAGE);
                         // Dispose the dialog window
                         frame.dispose();
+                        showAddProductDialog();
                     }
-
-                    // Adding row in database
-                    product.addProduct(productId, productName, category, costPrice, sellingPrice, quantity, minimumStockLevel,
-                            maximumStockLevel, reorderPoint, manufacturer, manufacturerCode, leadTime, table, (DefaultTableModel) table.getModel());
-
-                    // Dispose the dialog window
-                    frame.dispose();
+                    else
+                    {
+                        // Adding row in database
+                        int productId = Integer.parseInt(productID);
+                        if(product.addProduct(productId, productName, category, costPrice, sellingPrice, quantity, minimumStockLevel,
+                                maximumStockLevel, reorderPoint, manufacturer, manufacturerCode, leadTime, table, (DefaultTableModel) table.getModel())==1)
+                        {
+                            frame.dispose();
+                            showAddProductDialog();
+                        }
+                        else{
+                            // Dispose the dialog window
+                            frame.dispose();
+                        }
+                    }
                 } catch (NumberFormatException ex) {
-                    String errorMessage = "Invalid Product ID or numeric field format. Please enter valid values.";
-                    JOptionPane.showMessageDialog(null, errorMessage, "Invalid Product Data", JOptionPane.ERROR_MESSAGE);
+                    String errorMessage = "Invalid field input format. Please enter a valid input.";
+                    JOptionPane.showMessageDialog(null, errorMessage, "Invalid field input format", JOptionPane.ERROR_MESSAGE);
                     // Dispose the dialog window
                     frame.dispose();
+                    showAddProductDialog();
                 }
             }
-        }
         });
         buttonPanel.add(addButton);
 
@@ -351,6 +370,12 @@ public class P3_Products extends JPanel {
 
         frame.add(panel);
         frame.setVisible(true);
+    }
+
+    private void sellProductDialog(int selectedRow){
+        P0_UI_Main.PageButtonActionListener listener = new P0_UI_Main.PageButtonActionListener("Retailers",1);
+        ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
+        listener.actionPerformed(event);
     }
 
     private static boolean isNullOrEmpty(String str) {

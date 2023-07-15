@@ -47,7 +47,7 @@ public class product {
         }
     }
 
-    public static void addProduct(int productID, String productName, String category, BigDecimal costPrice,
+    public static int addProduct(int productID, String productName, String category, BigDecimal costPrice,
                                   BigDecimal sellingPrice, int quantity, int minimumStockLevel, int maximumStockLevel,
                                   int reorderPoint, String manufacturer, String manufacturerCode, int leadTime,
                                   JTable table, DefaultTableModel model) {
@@ -60,7 +60,7 @@ public class product {
         if (isProductIDExists(productID)) {
             String errorMessage = "Product ID already exists. Please choose a different Product ID.";
             JOptionPane.showMessageDialog(null, errorMessage, "Duplicate Product ID", JOptionPane.ERROR_MESSAGE);
-            return;
+            return 1;
         }
 
         try (Connection connection = DatabaseConnection.getConn()) {
@@ -103,6 +103,7 @@ public class product {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return 0;
 
     }
 
