@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 
 public class P2_Retailers extends JPanel {
     private JTextField searchField;
-    private JTable table;
+    private static JTable table;
     private JButton clearButton;
     private JPanel searchPanel;
     private JPanel buttonPanel;
@@ -352,6 +352,11 @@ public class P2_Retailers extends JPanel {
 
     private void clearHighlight() {
         table.clearSelection();
+    }
+
+    public static int selectRetailer()
+    {
+        return table.getSelectedRow();
     }
 
 

@@ -14,7 +14,7 @@ public class product {
         if(userType=="Administrator")
             query = new String("SELECT * FROM inventory");
         else
-            query = new String("SELECT productID, productName, category, quantity, minimumStockLevel, maximumStockLevel, reorderPoint, manufacturer, manufacturerCode, leadTime FROM inventory");
+            query = new String("SELECT productID, productName, category, quantity, minimumStockLevel, maximumStockLevel, reorderPoint, leadTime FROM inventory");
         try {
             PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             // Execute the query and get the result set
@@ -169,6 +169,11 @@ public class product {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void sellProduct(int quantity, int selectedProduct, int selectedRetailer)
+    {
+
     }
 
 }

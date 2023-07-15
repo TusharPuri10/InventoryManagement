@@ -372,10 +372,63 @@ public class P3_Products extends JPanel {
         frame.setVisible(true);
     }
 
-    private void sellProductDialog(int selectedRow){
-        P0_UI_Main.PageButtonActionListener listener = new P0_UI_Main.PageButtonActionListener("Retailers",1);
-        ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
-        listener.actionPerformed(event);
+    private void sellProductDialog(int selectedProduct){
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                P0_UI_Main.PageButtonActionListener listener = new P0_UI_Main.PageButtonActionListener("Retailers","Products",1,selectedProduct);
+                ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
+                listener.actionPerformed(event);
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(null, "Please select a retailer from the table.", "Choose Retailer", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        t1.start();
+        t2.start();
+    }
+
+    public static void sellDialog(int selectedProduct, int selectedRetailer) {
+
+        // Create and display the sell dialog
+        JDialog sellDialog = new JDialog();
+        sellDialog.setTitle("Sell Product");
+        sellDialog.setSize(400, 300);
+        sellDialog.setLocationRelativeTo(null);
+        sellDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Create and add components to the sell dialog
+        JLabel quantityLabel = new JLabel("Quantity:");
+        JTextField quantityField = new JTextField();
+        panel.add(quantityLabel);
+        panel.add(quantityField);
+
+        // Sell button action listener
+        JButton sellButton = new JButton("Sell");
+        sellButton.addActionListener(e -> {
+            // Get the quantity
+            int quantity = Integer.parseInt(quantityField.getText());
+
+            // Perform the sell operation using the selected product, retailer, and quantity
+            // ...
+            product.sellProduct(quantity,selectedProduct,selectedRetailer);
+
+            // Close the sell dialog
+            sellDialog.dispose();
+        });
+        panel.add(sellButton);
+
+        sellDialog.add(panel);
+        sellDialog.setVisible(true);
     }
 
     private static boolean isNullOrEmpty(String str) {

@@ -15,6 +15,7 @@ public class P0_UI_Main extends JFrame {
     private JPanel retailersPanel;
     private JPanel productsPanel;
     private JPanel logsPanel;
+    public static JButton selectButton;
 
     public P0_UI_Main(String userType,Connection connection) {
         setTitle(userType + " Page");
@@ -31,6 +32,8 @@ public class P0_UI_Main extends JFrame {
         JButton employeesButton = createSidePanelButton("Employees");
         JButton productsButton = createSidePanelButton("Products");
         JButton logsButton = createSidePanelButton("Logs");
+        selectButton = new JButton("Select");
+        selectButton.setVisible(false); // Hide the button initially
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -54,6 +57,8 @@ public class P0_UI_Main extends JFrame {
         sidePanel.add(productsButton, gbc);
         gbc.gridy++;
         sidePanel.add(logsButton, gbc);
+        gbc.gridy++;
+        sidePanel.add(selectButton, gbc);
 
         // Add an empty component to occupy remaining vertical space
         gbc.gridy++;
@@ -78,12 +83,12 @@ public class P0_UI_Main extends JFrame {
         contentPanel.add(logsPanel, "Logs");
 
         // Add action listeners to the buttons
-        homeButton.addActionListener(new PageButtonActionListener("Home",0));
-        retailersButton.addActionListener(new PageButtonActionListener("Retailers",0));
+        homeButton.addActionListener(new PageButtonActionListener("Home","",0,-1));
+        retailersButton.addActionListener(new PageButtonActionListener("Retailers","",0,-1));
         if(userType=="Administrator")
-            employeesButton.addActionListener(new PageButtonActionListener("Employees",0));
-        productsButton.addActionListener(new PageButtonActionListener("Products",0));
-        logsButton.addActionListener(new PageButtonActionListener("Logs",0));
+            employeesButton.addActionListener(new PageButtonActionListener("Employees","",0,-1));
+        productsButton.addActionListener(new PageButtonActionListener("Products","",0,-1));
+        logsButton.addActionListener(new PageButtonActionListener("Logs","",0,-1));
 
         // Add the side panel and content panel to the frame
         getContentPane().add(sidePanel, BorderLayout.WEST);
@@ -103,11 +108,15 @@ public class P0_UI_Main extends JFrame {
     }
 
     static class PageButtonActionListener implements ActionListener {
+        private  int selectedRow;
         private String page;
+        private String previousPage;
         private int selectionMode;
-        public PageButtonActionListener(String page, int selectionMode) {
+        public PageButtonActionListener(String page, String previousPage, int selectionMode, int selectedRow) {
             this.page = page;
+            this.previousPage = previousPage;
             this.selectionMode = selectionMode;
+            this.selectedRow = selectedRow;
         }
 
         @Override
@@ -116,8 +125,44 @@ public class P0_UI_Main extends JFrame {
             cardLayout.show(contentPanel, page);
 
             // Highlight the selected button
-            if(selectionMode==0)
+            if(selectionMode==1)
+            {
+                selectButton.setVisible(true);
+                selectButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Handle the "Select" button action here
+                        // You can trigger the necessary logic or method calls
+                        int selectedRow2=P2_Retailers.selectRetailer();
+                        if (selectedRow2 == -1) {
+                            JOptionPane.showMessageDialog(null, "Please select a retailer from the table.", "Choose Retailer", JOptionPane.INFORMATION_MESSAGE);
+                        }else{
+                            Thread t1 = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    P3_Products.sellDialog(selectedRow,selectedRow2);
+                                }
+                            });
+                            Thread t2 = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Switch back to the previous page after selecting the retailer
+                                    cardLayout.show(contentPanel, previousPage);
+                                    selectButton.setVisible(false);
+                                }
+                            });
+
+                            t1.start();
+                            t2.start();
+                        }
+                    }
+                });
+            }
+            else {
+                selectButton.setVisible(false);
                 highlightButton((JButton) e.getSource());
+            }
+                // make a select button here or make a select button and make it visible
         }
 
         private void highlightButton(JButton selectedButton) {
