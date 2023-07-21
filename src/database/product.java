@@ -112,6 +112,11 @@ public class product {
                 "Minimum Stock Level", "Maximum Stock Level", "Reorder Point", "Manufacturer", "Manufacturer Code", "Lead Time"};
     }
 
+    private static String[] getTableHeaders_emp() {
+        return new String[]{"Product ID", "Product Name", "Category", "Cost Price", "Selling Price", "Quantity",
+                "Minimum Stock Level", "Maximum Stock Level", "Reorder Point","Lead Time"};
+    }
+
     private static boolean isProductIDExists(int productID) {
         String selectQuery = "SELECT COUNT(*) FROM inventory WHERE productID = ?";
         try (Connection connection = DatabaseConnection.getConn();
@@ -171,68 +176,90 @@ public class product {
         }
     }
 
-    public static void sellProduct(Connection connection, int quantity, int selectedProduct, int selectedRetailer, String username, int userid,JTable table, DefaultTableModel model) throws SQLException {
-        // Get the key of the selected row (assuming it's stored in a column named "id")
-        Object rowKey = table.getValueAt(selectedProduct, table.getColumnModel().getColumnIndex("Product ID"));
-        query = new String("SELECT * FROM inventory WHERE productID=?");
-        try{
+    public static void sellProduct(int quantity, int selectedProduct, int selectedRetailer, String username, int userid, JTable table, DefaultTableModel model) throws SQLException {
+        // Get the key of the selected row (assuming it's stored in a column named "Product ID")
+        int productId = (int) table.getValueAt(selectedProduct, table.getColumnModel().getColumnIndex("Product ID"));
+
+        // Check if the quantity is valid and not negative
+        if (quantity <= 0) {
+            JOptionPane.showMessageDialog(null, "Invalid quantity entered.", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
+        try (Connection connection = DatabaseConnection.getConn()){
+            // Check if the product exists in the inventory
+            String query = "SELECT * FROM inventory WHERE productID=?";
             PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            statement.setObject(1, rowKey);
-            // Execute the query and get the result set
+            statement.setInt(1, productId);
             ResultSet resultSet = statement.executeQuery();
-// Check if the result set is not empty
+
+            // Check if the product exists in the inventory
             if (resultSet.next()) {
-                // Get the values from the result set for the product to be sold
-                int productId = resultSet.getInt("productID");
-                String productName = resultSet.getString("productName");
-                String category = resultSet.getString("category");
-                BigDecimal costPrice = resultSet.getBigDecimal("costPrice");
-                BigDecimal sellingPrice = resultSet.getBigDecimal("sellingPrice");
-                int leadTime = resultSet.getInt("leadTime");
+                // Get the available quantity in the inventory
+                int availableQuantity = resultSet.getInt("quantity");
 
-                // Insert the sold product into the products_sold table
-                String insertQuery = "INSERT INTO products_sold (productID, productName, category, costPrice, sellingPrice, quantity, leadTime, retailerID, employeeID, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
-                    insertStatement.setInt(1, productId);
-                    insertStatement.setString(2, productName);
-                    insertStatement.setString(3, category);
-                    insertStatement.setBigDecimal(4, costPrice);
-                    insertStatement.setBigDecimal(5, sellingPrice);
-                    insertStatement.setInt(6, quantity);
-                    insertStatement.setInt(7, leadTime);
-                    insertStatement.setInt(8, selectedRetailer);
-                    insertStatement.setInt(9, userid);
-                    insertStatement.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+                // Check if the available quantity is sufficient for selling
+                if (quantity > availableQuantity) {
+                    JOptionPane.showMessageDialog(null, "Not enough quantity available for sale.", "Quantity Not Enough", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Insert the sold product into the products_sold table
+                    String insertQuery = "INSERT INTO products_sold (productID, productName, category, costPrice, sellingPrice, quantity, leadTime, retailerID, employeeID, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                        insertStatement.setInt(1, productId);
+                        insertStatement.setString(2, resultSet.getString("productName"));
+                        insertStatement.setString(3, resultSet.getString("category"));
+                        insertStatement.setBigDecimal(4, resultSet.getBigDecimal("costPrice"));
+                        insertStatement.setBigDecimal(5, resultSet.getBigDecimal("sellingPrice"));
+                        insertStatement.setInt(6, quantity);
+                        insertStatement.setInt(7, resultSet.getInt("leadTime"));
+                        insertStatement.setInt(8, selectedRetailer);
+                        insertStatement.setInt(9, userid);
+                        insertStatement.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
 
-                    // Execute the INSERT operation
-                    int rowsInserted = insertStatement.executeUpdate();
-                    if (rowsInserted > 0) {
-                        System.out.println("Product sold and inserted successfully.");
-                        // Decrease the quantity of the sold product in the inventory
-                        int currentQuantity = resultSet.getInt("quantity");
-                        int newQuantity = currentQuantity - quantity;
-                        String updateQuery = "UPDATE inventory SET quantity=? WHERE productID=?";
-                        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-                            updateStatement.setInt(1, newQuantity);
-                            updateStatement.setInt(2, productId);
-                            int rowsUpdated = updateStatement.executeUpdate();
-                            if (rowsUpdated > 0) {
-                                System.out.println("Inventory quantity updated.");
-                                // Update the table model to reflect the updated inventory quantity
-                                model.setValueAt(newQuantity, selectedProduct, table.getColumnModel().getColumnIndex("quantity"));
+                        // Execute the INSERT operation
+                        int rowsInserted = insertStatement.executeUpdate();
+
+                        if (rowsInserted > 0) {
+                            System.out.println("Product sold and inserted successfully.");
+                            // Update the inventory quantity
+                            int newQuantity = availableQuantity - quantity;
+                            String updateQuery = "UPDATE inventory SET quantity=? WHERE productID=?";
+                            try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                                updateStatement.setInt(1, newQuantity);
+                                updateStatement.setInt(2, productId);
+                                int rowsUpdated = updateStatement.executeUpdate();
+                                if (rowsUpdated > 0) {
+                                    Object[][] newData = getAllproducts("Employee",connection);
+
+                                    // Update the table model with the new data
+                                    model.setDataVector(newData, getTableHeaders_emp());
+                                    model.fireTableDataChanged();
+
+                                    int[] columnWidths = {100, 150, 150, 180, 180, 120, 150, 120};
+                                    for (int i = 0; i < table.getColumnCount(); i++) {
+                                        table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+                                    }
+                                } else {
+                                    System.out.println("Failed to update inventory quantity.");
+                                    // Rollback the transaction if the inventory update fails
+                                    connection.rollback();
+                                }
                             }
+                        } else {
+                            System.out.println("Failed to insert product sold.");
+                            // Rollback the transaction if the product insertion fails
+                            connection.rollback();
                         }
-                    } else {
-                        System.out.println("Failed to insert product sold.");
                     }
                 }
             } else {
-                System.out.println("Product not found in the inventory.");
+                JOptionPane.showMessageDialog(null, "Product not found in the inventory.", "Product Not Found", JOptionPane.INFORMATION_MESSAGE);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        }
+    }
+
 
 }

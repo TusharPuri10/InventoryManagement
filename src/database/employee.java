@@ -81,8 +81,6 @@ public class employee {
             insertUserStatement.setString(4, "Employee");
 
             // Execute the INSERT statement for users
-
-            // Execute the INSERT statement for users
             int rowsAffectedUser = insertUserStatement.executeUpdate();
 
             // Close the insert statement for users

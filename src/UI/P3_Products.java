@@ -68,7 +68,7 @@ public class P3_Products extends JPanel {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }
 
-        //Scroll Panel
+//Scroll Panel
         // Create a scroll pane for the table
         scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove default border
@@ -431,16 +431,16 @@ public class P3_Products extends JPanel {
             // Perform the sell operation using the selected product, retailer, and quantity
             // ...
             try {
-                product.sellProduct(connection,quantity,selectedProduct,selectedRetailer,username,userid,table,(DefaultTableModel) table.getModel());
+                product.sellProduct(quantity,selectedProduct,selectedRetailer,username,userid,table,(DefaultTableModel) table.getModel());
+                // Close the sell dialog
+                SwingUtilities.invokeLater(() -> sellDialog.dispose());
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
 
-            // Close the sell dialog
-            sellDialog.dispose();
+
         });
         panel.add(sellButton);
-
         sellDialog.add(panel);
         sellDialog.setVisible(true);
     }

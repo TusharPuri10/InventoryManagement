@@ -148,7 +148,7 @@ public class P0_UI_Main extends JFrame {
                                 public void run() {
                                     // Switch back to the previous page after selecting the retailer
                                     cardLayout.show(contentPanel, previousPage);
-                                    selectButton.setVisible(false);
+                                    selectButton.setVisible(false);//hide it again
                                 }
                             });
 
