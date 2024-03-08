@@ -11,10 +11,14 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations/24.0.0/annotations-24.0.0.jar!/" />
+          <root url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>
