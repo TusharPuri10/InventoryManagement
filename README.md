@@ -11,4 +11,25 @@
 * Essential features include product management, inventory tracking, order processing, supplier management, reporting, user authentication, and an intuitive user interface.
 * By implementing this system, the whole-seller aims to efficiently manage their inventory, optimize stock levels, reduce costs, improve sales performance, and enhance overall productivity.
 
-### software architecture
+## Software Architecture
+
+### Backend
+* **Language**: Java
+* **Framework**: None (Standard Java SE)
+* **Database**: MySQL
+* **Multi-threading**: Implemented to enhance performance and responsiveness.
+* **Error Handling**: Robust error handling with custom exceptions to ensure a stable application.
+
+### Frontend
+* **Language**: Java
+* **GUI Framework**: Swing
+* **Design**: CardLayout for dynamic and smooth navigation between panels.
+
+### Features
+* **Product Management**: Add, update, delete, and view products.
+* **Inventory Tracking**: Monitor stock levels, set reorder points, and track product movements.
+* **Order Processing**: Handle incoming and outgoing orders efficiently.
+* **Supplier Management**: Manage supplier information and interactions.
+* **Reporting**: Generate reports for sales, inventory levels, and order history.
+* **User Authentication**: Secure login and role-based access control.
+* **User Interface**: Intuitive and easy-to-use interface designed for non-technical users.
