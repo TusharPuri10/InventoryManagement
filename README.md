@@ -12,11 +12,12 @@
 * By implementing this system, the whole-seller aims to efficiently manage their inventory, optimize stock levels, reduce costs, improve sales performance, and enhance overall productivity.
 
 ## Software Architecture
+![image](https://github.com/TusharPuri10/InventoryManagement/assets/92613357/9e166aa4-07c7-44c2-ba53-d116c09cde33)
 
 ### Backend
 * **Language**: Java
 * **Framework**: None (Standard Java SE)
-* **Database**: MySQL
+* **Database**: MySQL (free Azure SQL license got expired)
 * **Multi-threading**: Implemented to enhance performance and responsiveness.
 * **Error Handling**: Robust error handling with custom exceptions to ensure a stable application.
 
