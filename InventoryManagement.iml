@@ -11,14 +11,10 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" />
+          <root url="jar://$USER_HOME$/Downloads/mysql-connector-j-8.4.0/mysql-connector-j-8.4.0/mysql-connector-j-8.4.0.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" />
-        </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/sqljdbc_12.6/enu/jars" recursive="false" type="SOURCES" />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

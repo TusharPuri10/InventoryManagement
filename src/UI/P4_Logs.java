@@ -13,7 +13,7 @@ public class P4_Logs extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        JLabel titleLabel = new JLabel("Logs Page");
+        JLabel titleLabel = new JLabel("Logs Page (Feature will be released in version 2)");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(titleLabel, BorderLayout.CENTER);
